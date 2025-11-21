@@ -22,15 +22,15 @@ public class ItemService {
     private List<Item> items = new ArrayList<>();
 
     {
-        items.add(new Item("1", "name1", "000001","description1"));
+        items.add(new Item("name1", "000001","description1"));
         items.add(new Item("2", "name2", "000002","description3"));
         items.add(new Item("3", "name3", "000003","description3"));
     }
 
     // @PostConstruct // Можна закоментувати, щоб не падало без запущеної бази Mongo, для ArchUnit це не важливо
     void init() {
-        // itemRepository.deleteAll();
-        // itemRepository.saveAll(items);
+        itemRepository.deleteAll();
+        itemRepository.saveAll(items);
     }
 
     public List<Item> getAll() {

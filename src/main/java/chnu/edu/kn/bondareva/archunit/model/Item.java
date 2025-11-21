@@ -1,8 +1,6 @@
 package chnu.edu.kn.bondareva.archunit.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 /*
@@ -15,9 +13,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @NoArgsConstructor
-@AllArgsConstructor
 @Document
-public class Item {
+@Getter
+@Setter
+@ToString
+@Builder
+public class Item extends AuditMetadata{
     @Id
     private String id;
     private String name;
@@ -25,6 +26,12 @@ public class Item {
     private String description;
 
     public Item(String name, String code, String description) {
+        this.name = name;
+        this.code = code;
+        this.description = description;
+    }
+    public Item(String id, String name, String code, String description) {
+        this.id = id;
         this.name = name;
         this.code = code;
         this.description = description;
