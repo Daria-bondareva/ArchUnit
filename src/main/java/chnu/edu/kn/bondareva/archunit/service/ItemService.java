@@ -8,9 +8,12 @@ package chnu.edu.kn.bondareva.archunit.service;/*
 
 import chnu.edu.kn.bondareva.archunit.model.Item;
 import chnu.edu.kn.bondareva.archunit.repository.ItemRepository;
+import chnu.edu.kn.bondareva.archunit.request.ItemCreateRequest;
+import chnu.edu.kn.bondareva.archunit.request.ItemUpdateRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,11 +48,43 @@ public class ItemService {
         return itemRepository.save(item);
     }
 
+   public Item create(ItemCreateRequest request){
+        if (itemRepository.existsByCode(request.code())){
+            return null;
+        }
+        Item item = mapToItem(request);
+        item.setCreatedDate(LocalDateTime.now());
+        item.setUpdateDate(new ArrayList<LocalDateTime>());
+        return itemRepository.save(item);
+   }
+
     public Item update(Item item) {
+        return itemRepository.save(item);
+    }
+
+    public Item update(ItemUpdateRequest request) {
+        Item item = itemRepository.findById(request.id()).orElse(null);
+        if (item == null) {
+            return null;
+        }
+
+        item.setName(request.name());
+        item.setCode(request.code());
+        item.setDescription(request.description());
+
+        if (item.getUpdateDate() == null) {
+            item.setUpdateDate(new ArrayList<>());
+        }
+        item.getUpdateDate().add(LocalDateTime.now());
+
         return itemRepository.save(item);
     }
 
     public void delById(String id) {
         itemRepository.deleteById(id);
+    }
+    private Item mapToItem(ItemCreateRequest request){
+        Item item = new Item(request.name(), request.code(), request.description());
+        return item;
     }
 }
