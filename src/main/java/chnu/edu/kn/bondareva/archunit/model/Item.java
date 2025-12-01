@@ -1,7 +1,9 @@
 package chnu.edu.kn.bondareva.archunit.model;
 
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +29,9 @@ public class Item extends AuditMetadata{
     private String name;
     private String code;
     private String description;
+    @CreatedDate
     private LocalDateTime createDate;
+    @LastModifiedDate
     private List<LocalDateTime> updateDate;
     public Item(String name, String code, String description) {
         this.name = name;

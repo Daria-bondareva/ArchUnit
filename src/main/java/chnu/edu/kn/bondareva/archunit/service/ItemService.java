@@ -10,6 +10,7 @@ import chnu.edu.kn.bondareva.archunit.model.Item;
 import chnu.edu.kn.bondareva.archunit.repository.ItemRepository;
 import chnu.edu.kn.bondareva.archunit.request.ItemCreateRequest;
 import chnu.edu.kn.bondareva.archunit.request.ItemUpdateRequest;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class ItemService {
         items.add(new Item("3", "name3", "000003","description3"));
     }
 
-    // @PostConstruct // Можна закоментувати, щоб не падало без запущеної бази Mongo, для ArchUnit це не важливо
+    @PostConstruct
     void init() {
         itemRepository.deleteAll();
         itemRepository.saveAll(items);
@@ -40,25 +41,53 @@ public class ItemService {
         return itemRepository.findAll();
     }
 
+    public void createAll(List<Item> items) {
+        LocalDateTime now = LocalDateTime.now();
+        for (Item item : items) {
+            if (item.getCreateDate() == null) item.setCreateDate(now);
+            if (item.getLastModifiedDate() == null) item.setLastModifiedDate(now); // Додаємо це
+        }
+        itemRepository.saveAll(items);
+    }
     public Item getById(String id) {
         return itemRepository.findById(id).orElse(null);
     }
 
     public Item create(Item item) {
+        LocalDateTime now = LocalDateTime.now();
+        item.setCreateDate(now);
+
+        item.setLastModifiedDate(now);
+
+        if (item.getUpdateDate() == null) {
+            item.setUpdateDate(new ArrayList<>());
+        }
         return itemRepository.save(item);
     }
 
-   public Item create(ItemCreateRequest request){
+    public Item create(ItemCreateRequest request){
         if (itemRepository.existsByCode(request.code())){
             return null;
         }
         Item item = mapToItem(request);
-        item.setCreatedDate(LocalDateTime.now());
+
+        LocalDateTime now = LocalDateTime.now();
+        item.setCreateDate(now);
+
+        item.setLastModifiedDate(now);
+
         item.setUpdateDate(new ArrayList<LocalDateTime>());
         return itemRepository.save(item);
-   }
+    }
 
     public Item update(Item item) {
+        if (item.getUpdateDate() == null) {
+            item.setUpdateDate(new ArrayList<>());
+        }
+        LocalDateTime now = LocalDateTime.now();
+        //item.getUpdateDate().add(now);
+        item.setLastModifiedDate(now);
+
         return itemRepository.save(item);
     }
 
@@ -75,7 +104,9 @@ public class ItemService {
         if (item.getUpdateDate() == null) {
             item.setUpdateDate(new ArrayList<>());
         }
-        item.getUpdateDate().add(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        item.getUpdateDate().add(now);
+        item.setLastModifiedDate(now);
 
         return itemRepository.save(item);
     }
